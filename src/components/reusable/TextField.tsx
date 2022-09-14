@@ -12,7 +12,7 @@ export default function TextField(props: TextFieldProps) {
         <div className="flex items-center gap-2">
         {props.icon}
         <input ref={props.inputRef} placeholder={props.placeholder} type={props.type}
-            className="w-full rounded text-lg text-black p-2" />
+            className="w-full rounded text-lg text-l_text p-2 border-2 bg-l_input dark:bg-d_input" />
         </div>
     </div>
 }

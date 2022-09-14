@@ -6,7 +6,7 @@ import TextButton from "../reusable/TextButton";
 import * as Yup from "yup"
 import { useAppDispatch, useAppSelector } from "../../types/hooks";
 import { authActions } from "../../slices/authSlice";
-console.log(authActions)
+
 const signUpValidation = Yup.object().shape({
     name: Yup.string()
         .required("Name is required"),
@@ -30,10 +30,10 @@ export default function Signup() {
     const dispatch = useAppDispatch()
     const { isError, error, isLoading, loading } = useAppSelector(state => state.auth)
 
-    const nameRef = useRef(null)
-    const emailRef = useRef(null)
-    const passwordRef = useRef(null)
-    const confirmPasswordRef = useRef(null)
+    const nameRef = useRef<any>(null)
+    const emailRef = useRef<any>(null)
+    const passwordRef = useRef<any>(null)
+    const confirmPasswordRef = useRef<any>(null)
     
     const attemptSignUp = async () => {
         dispatch(authActions.setError([false, null]))
@@ -49,8 +49,8 @@ export default function Signup() {
         dispatch(authActions.setError([true, "Error occured"]))
     }
 
-    return <div className="w-full h-screen flex items-center justify-end">
-        <div className="w-[500px] h-screen p-4 rounded-lg flex flex-col gap-4 items-center bg-gray-900 shadow-lg">
+    return <div className="w-full h-screen flex items-center justify-end bg-l_background dark:bg-d_background">
+        <div className="w-[500px] h-screen p-4 rounded-lg flex flex-col gap-4 items-center bg-l_backgroundLight dark:bg-d_backgroundLight shadow-lg">
             <h1 className="">QuizUp!</h1>
 
             <TextField title="Name" type="text" icon={<MdPerson size={32} />} placeholder="John Doe" inputRef={nameRef} />
@@ -58,13 +58,13 @@ export default function Signup() {
             <TextField title="Password" type="password" icon={<MdOutlinePassword size={32} />} placeholder="•••••••••" inputRef={passwordRef} />
             <TextField title="Confirm password" type="password" icon={<MdOutlinePassword size={32} />} placeholder="•••••••••" inputRef={confirmPasswordRef} />
 
-            {isError && <div className="text-red-600 transition-all">
+            {isError && <div className="text-error transition-all">
                 This is an error!
             </div>}
 
             <div className="flex flex-col gap-4 mt-4 items-center">
                 <Button clickHandler={attemptSignUp} text="Create account" variant="filled" />
-                <TextButton text="Sign in" />
+                <TextButton clickHandler={() => {}} text="Sign in" />
             </div>
         </div>
     </div>
