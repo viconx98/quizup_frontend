@@ -3,10 +3,12 @@ import axios from "axios"
 export enum Endpoints {
     Signin = "/auth/signin",
     Signup = "/auth/signup",
-    RefreshToken = "/auth/refreshToken"
+    RefreshToken = "/auth/refreshToken",
+    GetQuizzes = "/quiz/me",
+    AddQuiz = "/quiz/add",
+    DeleteQuiz = "/quiz/delete"
 }
 
-const EXCLUDED_URLS = [Endpoints.Signin, Endpoints.Signup]
 
 const axiosClient = axios.create({
     baseURL: "http://localhost:3001"
