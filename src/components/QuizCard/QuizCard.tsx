@@ -4,6 +4,8 @@ import IconButton from "../reusable/IconButton"
 import { FC } from "react"
 import { useAppDispatch } from "../../types/hooks"
 import { manageQuizActions } from "../../slices/manageQuizSlice"
+import { editQuizActions } from "../../slices/editQuizSlice"
+import { useNavigate } from "react-router-dom"
 
 export interface QuizProps {
     quiz: Quiz
@@ -11,10 +13,16 @@ export interface QuizProps {
 
 const QuizCard: FC<QuizProps> = ({quiz}) => {
     const dispatch = useAppDispatch()
+    const navigate = useNavigate()
 
     const showDeleteDialog = () => {
         dispatch(manageQuizActions.setQuizToDelete(quiz._id))
         dispatch(manageQuizActions.setShouldShowDelete(true))
+    }
+
+    const editQuiz = () => {
+        dispatch(editQuizActions.setQuizId(quiz._id))
+        navigate("/edit")
     }
 
     return <div className="flex gap-4 p-4 min-w-fit max-w-sm bg-l_backgroundLight dark:bg-d_backgroundLight rounded-md shadow-md">
@@ -33,7 +41,7 @@ const QuizCard: FC<QuizProps> = ({quiz}) => {
 
             <div className="flex gap-4">
                 <IconButton disabled={quiz.questions.length === 0} icon={<MdPlayCircleFilled/>}/>
-                <IconButton icon={<MdMode/>}/>
+                <IconButton icon={<MdMode/>} clickHandler={editQuiz}/>
                 <IconButton icon={<MdDelete/>} clickHandler={showDeleteDialog}/>
             </div>
         </div>

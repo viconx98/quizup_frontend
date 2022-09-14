@@ -1,9 +1,11 @@
 import axios from "axios"
 
 export enum Endpoints {
+    Base = "http://localhost:3001",
     Signin = "/auth/signin",
     Signup = "/auth/signup",
     RefreshToken = "/auth/refreshToken",
+    Quiz = "/quiz/",
     GetQuizzes = "/quiz/me",
     AddQuiz = "/quiz/add",
     DeleteQuiz = "/quiz/delete"
@@ -11,7 +13,7 @@ export enum Endpoints {
 
 
 const axiosClient = axios.create({
-    baseURL: "http://localhost:3001"
+    baseURL: Endpoints.Base
 })
 
 // Response interceptor to replace default error messages with backend error messages

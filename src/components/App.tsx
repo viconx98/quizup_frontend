@@ -1,6 +1,7 @@
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../types/hooks';
+import EditQuiz from './EditQuiz/EditQuiz';
 import Home from './Home/Home';
 import MyQuizzes from './MyQuizzes/MyQuizzes';
 import Signin from './Signin/Signin';
@@ -21,6 +22,7 @@ function App() {
 
         <Route path='/' element={<Home/>}>
           <Route index element={<MyQuizzes/>} />
+          <Route path='/edit' element={<EditQuiz/>} />
         </Route>
       </Routes>
     </div>
