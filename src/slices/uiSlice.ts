@@ -6,7 +6,7 @@ interface UiState {
 
 // TODO: Load preference from local storage
 const initialState: UiState = {
-    isDarkTheme: true
+    isDarkTheme: false
 }
 
 const uiSlice = createSlice({

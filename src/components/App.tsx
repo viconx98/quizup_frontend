@@ -1,6 +1,8 @@
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../types/hooks';
+import Home from './Home/Home';
+import Signin from './Signin/Signin';
 import Signup from './Signup/Signup';
 
 function App() {
@@ -14,7 +16,11 @@ function App() {
     <div className={classString}>
       <Routes>
         <Route path='/signup' element={<Signup />} />
+        <Route path='/signin' element={<Signin />} />
 
+        <Route path='/' element={<Home/>}>
+
+        </Route>
       </Routes>
     </div>
   );

@@ -1,6 +1,6 @@
 import axios from "axios"
 
-enum Endpoints {
+export enum Endpoints {
     Signin = "/auth/signin",
     Signup = "/auth/signup",
     RefreshToken = "/auth/refreshToken"

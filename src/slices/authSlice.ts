@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
-import { User } from "../types/auth";
+import axiosClient, { Endpoints } from "../axios_config";
+import { SigninData, SignupData, TokenData, User } from "../types/auth";
 import { SliceState } from "../types/slice";
 
 interface AuthState extends SliceState {
@@ -7,9 +8,11 @@ interface AuthState extends SliceState {
     authComplete: boolean,
 }
 
+const initialUser: User = JSON.parse(localStorage.getItem("user")!)
+
 const initialState: AuthState = {
-    user: null,
-    authComplete: false,
+    user: initialUser,
+    authComplete: initialUser !== null,
     isLoading: false,
     loading: null,
     isError: false,
@@ -18,8 +21,19 @@ const initialState: AuthState = {
 
 const signup = createAsyncThunk(
     "authSlice/signup",
-    async () => {
+    async (signupData: SignupData) => {
+        const response = await axiosClient.post(Endpoints.Signup, signupData)
 
+        return response.data as TokenData
+    }
+)
+
+const signin = createAsyncThunk(
+    "authSlice/signin",
+    async (signinData: SigninData) => {
+        const response = await axiosClient.post(Endpoints.Signin, signinData)
+
+        return response.data as TokenData
     }
 )
 
@@ -32,12 +46,48 @@ const authSlice = createSlice({
             state.error = action.payload[1]
         }
     },
-    extraReducers: {
+    extraReducers: (builder) => {
+        builder.addCase(signup.pending, (state, action) => {
+            state.isLoading = true
+        }).addCase(signup.fulfilled, (state, action: PayloadAction<TokenData>) => {
+            state.isLoading = false
+            state.loading = null
+            state.isError = false
+            state.error = null
 
+            localStorage.setItem("user", JSON.stringify(action.payload))
+
+            state.user = action.payload.user
+            state.authComplete = true
+        }).addCase(signup.rejected, (state, action) => {
+            state.isLoading = false
+            state.isError = true
+
+            state.error = action.error.message!
+        })
+
+        builder.addCase(signin.pending, (state, action) => {
+            state.isLoading = true
+        }).addCase(signin.fulfilled, (state, action: PayloadAction<TokenData>) => {
+            state.isLoading = false
+            state.loading = null
+            state.isError = false
+            state.error = null
+
+            localStorage.setItem("user", JSON.stringify(action.payload))
+
+            state.user = action.payload.user
+            state.authComplete = true
+        }).addCase(signin.rejected, (state, action) => {
+            state.isLoading = false
+            state.isError = true
+
+            state.error = action.error.message!
+        })
     }
 })
 
 
 export const authActions = { ...authSlice.actions }
-export const authAsyncActions = {}
+export const authAsyncActions = {signup, signin}
 export default authSlice.reducer
