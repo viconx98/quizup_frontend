@@ -31,7 +31,7 @@ axiosClient.interceptors.response.use(
 // Request interceptor to pass the token
 axiosClient.interceptors.request.use(
     (request) => {
-        if (request.url === Endpoints.Signin || request.url === Endpoints.Signup)
+        if (request.url === Endpoints.Signin || request.url === Endpoints.Signup || request.url === Endpoints.RefreshToken)
             return request
 
         const user = JSON.parse(localStorage.getItem("user")!)
