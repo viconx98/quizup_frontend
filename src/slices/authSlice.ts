@@ -4,11 +4,11 @@ import { SigninData, SignupData, TokenData, User } from "../types/auth";
 import { SliceState } from "../types/slice";
 
 interface AuthState extends SliceState {
-    user: User | null
+    user: TokenData | null
     authComplete: boolean,
 }
 
-const initialUser: User = JSON.parse(localStorage.getItem("user")!)
+const initialUser: TokenData = JSON.parse(localStorage.getItem("user")!)
 
 const initialState: AuthState = {
     user: initialUser,
@@ -57,7 +57,7 @@ const authSlice = createSlice({
 
             localStorage.setItem("user", JSON.stringify(action.payload))
 
-            state.user = action.payload.user
+            state.user = action.payload
             state.authComplete = true
         }).addCase(signup.rejected, (state, action) => {
             state.isLoading = false
@@ -76,7 +76,7 @@ const authSlice = createSlice({
 
             localStorage.setItem("user", JSON.stringify(action.payload))
 
-            state.user = action.payload.user
+            state.user = action.payload
             state.authComplete = true
         }).addCase(signin.rejected, (state, action) => {
             state.isLoading = false

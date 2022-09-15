@@ -4,6 +4,8 @@ import { useAppDispatch, useAppSelector } from '../types/hooks';
 import EditQuiz from './EditQuiz/EditQuiz';
 import Home from './Home/Home';
 import MyQuizzes from './MyQuizzes/MyQuizzes';
+import PlayQuiz from './PlayQuiz/PlayQuiz';
+import RunQuiz from './RunQuiz/RunQuiz';
 import Signin from './Signin/Signin';
 import Signup from './Signup/Signup';
 
@@ -17,6 +19,8 @@ function App() {
   return (
     <div className={classString}>
       <Routes>
+        <Route path='/play' element={<PlayQuiz   />} />
+        <Route path='/run/:quizId' element={<RunQuiz />} />
         <Route path='/signup' element={<Signup />} />
         <Route path='/signin' element={<Signin />} />
 

@@ -4,6 +4,8 @@ import uiReducer from "./slices/uiSlice";
 import myQuizzesReducer from "./slices/myQuizzesSlice";
 import manageQuizReducer from "./slices/manageQuizSlice";
 import editQuizReducer from "./slices/editQuizSlice";
+import runQuizReducer from "./slices/runQuizSlice";
+import playQuizReducer from "./slices/playQuizSlice";
 
 const mainStore = configureStore({
     reducer: {
@@ -12,6 +14,8 @@ const mainStore = configureStore({
         myQuizzes: myQuizzesReducer,
         manageQuiz: manageQuizReducer,
         editQuiz: editQuizReducer,
+        runQuiz: runQuizReducer,
+        playQuiz: playQuizReducer
     }
 })
 

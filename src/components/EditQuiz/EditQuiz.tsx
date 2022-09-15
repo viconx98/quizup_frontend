@@ -6,6 +6,8 @@ import AddQuestionDialog from "../AddQuestionDialog/AddQuestionDialog";
 import QuestionCard from "../QuestionCard/QuestionCard";
 import DeleteQuestionDialog from "../DeleteQuestionDialog/DeleteQuestionDialog";
 
+// TODO: Clear dialog states when the dialog closes
+// TODO: Clear dialog states when the question type changes
 const EditQuiz: FC = () => {
     const { quizId, quiz, isLoading, shouldShowAdd, shouldShowDelete } = useAppSelector(state => state.editQuiz)
     const dispatch = useAppDispatch()
