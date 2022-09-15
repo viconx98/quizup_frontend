@@ -6,7 +6,7 @@ export enum QuestionType {
 export interface Question {
     _id: string;
     question: string;
-    correctAnswer: string | boolean;
+    correctAnswer: string;
     questionType: QuestionType;
     options: string[] 
 } 

@@ -36,12 +36,12 @@ export default function MyQuizzes() {
                         quizzes.length === 0
                             ? <div className="flex flex-col items-center w-full text-center m-4">
                                 <p className="text-2xl">You have no quizzes</p>
-                                <TextButton text="Create a quiz!" clickHandler={showAddDialog} />
+                                <TextButton text="Create your first quiz!" clickHandler={showAddDialog} />
                             </div>
                             : <div className="flex flex-col">
                                 <div className="flex justify-between items-center">
                                     <p>Your quizzes</p>
-                                    <Button clickHandler={showAddDialog} variant="filled" text="Add Quiz" />
+                                    <TextButton clickHandler={showAddDialog}  text="Add Quiz" />
                                 </div>
 
                                 <div className="flex flex-wrap gap-4 mt-4">

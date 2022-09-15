@@ -11,7 +11,7 @@ const mainStore = configureStore({
         auth: authReducer,
         myQuizzes: myQuizzesReducer,
         manageQuiz: manageQuizReducer,
-        editQuiz: editQuizReducer
+        editQuiz: editQuizReducer,
     }
 })
 

@@ -8,7 +8,9 @@ export enum Endpoints {
     Quiz = "/quiz/",
     GetQuizzes = "/quiz/me",
     AddQuiz = "/quiz/add",
-    DeleteQuiz = "/quiz/delete"
+    DeleteQuiz = "/quiz/delete",
+    AddQuestion = "/quiz/question/add",
+    DeleteQuestion = "/quiz/question/delete",
 }
 
 
