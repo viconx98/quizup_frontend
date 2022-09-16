@@ -34,14 +34,16 @@ export default function MyQuizzes() {
                 : <div className="flex flex-col flex-1">
                     {
                         quizzes.length === 0
-                            ? <div className="flex flex-col items-center w-full text-center m-4">
-                                <p className="text-2xl">You have no quizzes</p>
-                                <TextButton text="Create your first quiz!" clickHandler={showAddDialog} />
+                            ? <div className="flex flex-col flex-1 justify-center items-center ">
+                                <div className="flex flex-col w-fit p-8 items-center gap-8 rounded-md border-2 border-primary-500 border-dotted">
+                                    <p className="text-2xl">You have no quizzes</p>
+                                    <TextButton text="Create your first quiz!" clickHandler={showAddDialog} />
+                                </div>
                             </div>
                             : <div className="flex flex-col">
                                 <div className="flex justify-between items-center">
                                     <p>Your quizzes</p>
-                                    <TextButton clickHandler={showAddDialog}  text="Add Quiz" />
+                                    <TextButton clickHandler={showAddDialog} text="Add Quiz" />
                                 </div>
 
                                 <div className="flex flex-wrap gap-4 mt-4">

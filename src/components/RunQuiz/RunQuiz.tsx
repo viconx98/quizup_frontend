@@ -103,7 +103,7 @@ const RunQuiz: FC = () => {
     const getAnswerCount = (answer: string, questionId: string) => {
         const answers = quizRoom!.answerData[questionId]
         let count = 0
-        
+
         for (const ans of Object.values(answers)) {
             if (ans === answer) count++
         }
@@ -119,23 +119,44 @@ const RunQuiz: FC = () => {
         switch (quizRoom?.status) {
             case "waiting":
                 return <div className="flex flex-col w-full min-h-screen p-4 gap-2 justify-start items-center bg-l_background dark:bg-d_background">
-                    <p className="text-2xl px-4 py-2 rounded-md bg-primary-600/25">
+                    <p className="text-2xl px-4 py-2 rounded-md bg-primary-600">
                         {quizRoom.quiz.title}
                     </p>
 
                     <div>Waiting for players to join</div>
 
                     <div className="flex gap-4 p-4 w-full flex-1">
-                        <div className="flex flex-col justify-center items-center flex-1 bg-l_backgroundLight dark:bg-d_backgroundLight p-4 rounded-md shadow-md">
+                        <div className="flex flex-col flex-1 bg-l_backgroundLight dark:bg-d_backgroundLight p-4 rounded-md shadow-md">
+                            <p>Players</p>
+                            <div className="flex flex-col gap-4">
                             {
-                                quizRoom.players.map(player => <p>{player.username}</p>)
+                                quizRoom.players.map(player => {
+                                    return <div className="flex gap-4 p-2 items-center rounded-md bg-l_backgroundLighter dark:bg-d_backgroundLighter">
+                                        <img src={player.avatar} alt="player avatar" className="h-[32px] w-[32px]" />
+                                        <p>{player.username}</p>
+                                    </div>
+                                })
                             }
+                            </div>
                         </div>
 
-                        <div className="flex justify-center items-center flex-1 bg-l_backgroundLight dark:bg-d_backgroundLight p-4 rounded-md shadow-md">
-                            Gamepin: {quizRoom.pin}
+                        <div className="flex flex-col flex-1 justify-center  bg-l_backgroundLight dark:bg-d_backgroundLight p-4 rounded-md shadow-md">
 
-                            <Link to={"/play?pin=" + quizRoom.pin} target="_blank">Play</Link>
+                            <div className="flex flex-col flex-1 p-4">
+                                <div className="flex-1 h-full">
+                                    <p>dfdsfdsf</p>
+                                </div>
+                            </div>
+
+                            <div className="flex flex-col items-center justify-evenly flex-1 p-4">
+                                <p>Share this game pin <span className="text-3xl italic p-2 bg-primary-600/25 rounded-md shadow-md">{quizRoom.pin}</span>
+                                </p>
+                                <p>Or</p>
+                                <p>This link <Link to={"/play?pin=" + quizRoom.pin} target="_blank" className="text-2xl text-primary-500">
+                                    {"http://localhost:3000" + "/play?pin=" + quizRoom.pin}
+                                </Link></p>
+                            </div>
+
                         </div>
                     </div>
 
@@ -146,11 +167,11 @@ const RunQuiz: FC = () => {
                     <p>{quizRoom.quiz.questions[quizRoom.currentIndex].question}</p>
 
                     <p>{quizRoom.quiz.questions[quizRoom.currentIndex].options.map(opt => {
-                        
+
                         return <p>{opt} {getAnswerCount(opt, quizRoom.quiz.questions[quizRoom.currentIndex]._id)}</p>
                     })}</p>
 
-                    <Button variant="filled" text="Next Question" clickHandler={nextQuestion}/>
+                    <Button variant="filled" text="Next Question" clickHandler={nextQuestion} />
                 </div>
             case "completed":
                 return <div>Waiting</div>

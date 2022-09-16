@@ -22,6 +22,7 @@ module.exports = {
         // Light Theme
         l_background: "whitesmoke",
         l_backgroundLight: "#fff",
+        l_backgroundLighter: "#a1a1aa",
         l_text: "#000",
         l_textLight: "#6b7280",
         l_input: "#d1d5db",
@@ -29,6 +30,7 @@ module.exports = {
         // Dark Theme
         d_background: "#171717",
         d_backgroundLight: "#262626",
+        d_backgroundLighter: "#404040",
         d_text: "#fff",
         d_textLight: "#6b7280",
         d_input: "#fff",
