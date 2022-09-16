@@ -2,11 +2,15 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { SliceState } from "../types/slice";
 
 type Status = "join" | "waiting" | "playing" | "completed"
- 
+
+// {"question":{"question":"Is react fun?","correctAnswer":"Negative","options":["No","Nope","Nah","Negative"],"questionType":"choice","_id":"6322ef1964895ae81a6598da"}}
 
 interface PlayQuizState extends SliceState {
-    status: Status,
-    data: any
+    status: Status;
+    socketConnected: boolean;
+    data: any;
+    question: any;
+    completedQuiz: any;
 }
 
 // TODO: Load preference from local storage
@@ -16,7 +20,10 @@ const initialState: PlayQuizState = {
     isError: false,
     error: null,
     status: "join",
-    data: null
+    data: null,
+    question: null,
+    socketConnected: false,
+    completedQuiz: null
 }
 
 const playQuizSlice = createSlice({
@@ -26,9 +33,18 @@ const playQuizSlice = createSlice({
         setStatus(state, action: PayloadAction<Status>) {
             state.status = action.payload
         },
+        setSocketConnected(state, action: PayloadAction<boolean>) {
+            state.socketConnected = action.payload
+        },
+        setCompletedQuiz(state, action) {
+            state.completedQuiz = action.payload
+        },
         setData(state, action) {
             state.data = action.payload
-        }
+        },
+        setQuestion(state, action) {
+            state.question = action.payload
+        },
     }
 })
 

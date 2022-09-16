@@ -6,7 +6,8 @@ import { Quiz } from "../types/myquizzes";
 
 interface RunQuizState extends SliceState {
     quizId: string;
-    quizRoom: QuizRoom | null
+    quizRoom: QuizRoom | null;
+    socketConnected: boolean;
 }
 
 export interface QuizRoom {
@@ -16,7 +17,8 @@ export interface QuizRoom {
     quizId: string;
     players: any[];
     status: "waiting" | "playing" | "completed";
-    quizRoom: Quiz;
+    quiz: Quiz;
+    answerData: any;
     currentIndex: number;
 }
 
@@ -26,7 +28,8 @@ const initialState: RunQuizState = {
     isError: false,
     error: null,
     quizId: "",
-    quizRoom: null 
+    quizRoom: null,
+    socketConnected: false
 }
 
 const runQuizSlice = createSlice({
@@ -36,7 +39,9 @@ const runQuizSlice = createSlice({
         setQuizId(state, action: PayloadAction<string>) {
             state.quizId = action.payload
         },
-
+        setSocketConnected(state, action: PayloadAction<boolean>) {
+            state.socketConnected = action.payload
+        },
         setQuizRoom(state, action: PayloadAction<QuizRoom>) {
             state.quizRoom = action.payload
         }
