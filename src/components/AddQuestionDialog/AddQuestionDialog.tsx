@@ -1,17 +1,71 @@
-import { FC, useRef } from "react"
+import { FC, useEffect, useRef } from "react"
 import Button from "../reusable/Button"
 import TextButton from "../reusable/TextButton"
 import TextField from "../reusable/TextField"
 import { useAppDispatch, useAppSelector } from "../../types/hooks"
-import { manageQuizActions, manageQuizAsyncActions } from "../../slices/manageQuizSlice"
 import { QuestionType } from "../../types/myquizzes"
 import { editQuizActions, editQuizAsyncActions } from "../../slices/editQuizSlice"
 import OptionField from "../reusable/OptionField"
+import * as Yup from "yup"
+
+const choiceQuestionValidation = Yup.object().shape({
+    quizId: Yup.string()
+        .required("Something went wrong while adding the question. Please try again."),
+
+    questionData: Yup.object().shape({
+        question: Yup.string()
+            .test(
+                "empty-string",
+                "Please enter a question",
+                (question) => {
+                    return question !== undefined && question.trim().length >= 1
+                }
+            )
+            .required("Please enter a question"),
+        correctAnswer: Yup.string()
+            .required("Please pick a correct answer"),
+        options: Yup.array()
+            .test(
+                "number-of-options",
+                "Please pick all four options",
+                (options) => options?.length === 4 && options?.every(opt => opt.trim().length >= 1)
+            )
+            .required("Please pick the options")
+    }),
+
+
+})
+
+const booleanQuestionValidation = Yup.object().shape({
+    quizId: Yup.string()
+        .required("Something went wrong while adding the question. Please try again."),
+
+    questionData: Yup.object().shape({
+        question: Yup.string()
+            .test(
+                "empty-string",
+                "Please enter a question",
+                (question) => {
+                    return question !== undefined && question.trim().length >= 1
+                }
+            )
+            .required("Please enter a question"),
+        correctAnswer: Yup.string()
+            .required("Please pick a correct answer"),
+    })
+})
 
 
 const AddQuestionDialog: FC = () => {
     const dispatch = useAppDispatch()
-    const {quizId, questionType, choiceOptions, correctAnswer, question } = useAppSelector(state => state.editQuiz)
+    const { quizId, questionType, choiceOptions, correctAnswer, question, isError, error } = useAppSelector(state => state.editQuiz)
+
+
+    useEffect(() => {
+        return () => {
+            dispatch(editQuizActions.resetAddDialog())
+        }
+    }, [])
 
     // TODO: Maybe clear the state of other type 
     const onTypeChange = (event: any) => {
@@ -49,7 +103,7 @@ const AddQuestionDialog: FC = () => {
             }
         } else {
             console.log(event.target)
-            const radioValue = event.target.value 
+            const radioValue = event.target.value
             const answer = choiceOptions[radioValue]
 
             dispatch(editQuizActions.setCorrectAnswer(answer))
@@ -57,7 +111,7 @@ const AddQuestionDialog: FC = () => {
     }
 
 
-    const addQuestion = () => {
+    const addQuestion = async () => {
         // TODO: Validation
         const requestData: any = {
             quizId: quizId,
@@ -67,15 +121,24 @@ const AddQuestionDialog: FC = () => {
                 questionType: questionType.toString(),
             }
         }
-        
+
         if (questionType === QuestionType.Choice) {
             requestData.questionData.options = Object.values(choiceOptions)
         } else {
             requestData.questionData.options = [true, false]
         }
 
+        try {
+            questionType === QuestionType.Choice
+                ? await choiceQuestionValidation.validate(requestData)
+                : await booleanQuestionValidation.validate(requestData)
 
-        dispatch(editQuizAsyncActions.addQuestion(requestData))
+
+            dispatch(editQuizAsyncActions.addQuestion(requestData))
+
+        } catch (error: any) {
+            dispatch(editQuizActions.setError([true, error.message]))
+        }
     }
 
     return <div className="absolute flex w-full h-full top-0 left-0 items-center justify-center backdrop-blur-sm">
@@ -103,7 +166,7 @@ const AddQuestionDialog: FC = () => {
                 && <div className="w-[150px] flex flex-col gap-4">
                     <OptionField placeholder="Option 1" onChange={onChoiceChange} onSelected={onCorrectAnswerChange} inputId="option1" groupName="option" />
                     <OptionField placeholder="Option 2" onChange={onChoiceChange} onSelected={onCorrectAnswerChange} inputId="option2" groupName="option" />
-                    <OptionField placeholder="Option 3" onChange={onChoiceChange} onSelected={onCorrectAnswerChange}inputId="option3" groupName="option" />
+                    <OptionField placeholder="Option 3" onChange={onChoiceChange} onSelected={onCorrectAnswerChange} inputId="option3" groupName="option" />
                     <OptionField placeholder="Option 4" onChange={onChoiceChange} onSelected={onCorrectAnswerChange} inputId="option4" groupName="option" />
                 </div>
             }
@@ -123,7 +186,10 @@ const AddQuestionDialog: FC = () => {
             }
 
 
-            <p className="mt-auto"></p>
+            <p className="mt-auto">
+
+            </p>
+            {isError && <p className="text-red-500">{error}</p>}
             <Button text="Add" clickHandler={addQuestion} variant="filled" />
             <TextButton text="Cancel" clickHandler={() => { dispatch(editQuizActions.setShowAddDialog(false)) }} />
         </div>

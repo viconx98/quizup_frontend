@@ -1,8 +1,6 @@
 import { FC } from "react"
 
 interface OptionFieldProps {
-    // title: string;
-    // type?: string;
     inputId: string;
     placeholder?: string;
     groupName: string;

@@ -20,15 +20,17 @@ const EditQuiz: FC = () => {
         dispatch(editQuizActions.setShowAddDialog(true))
     }
 
-    return <div className="w-full flex flex-col">
+    return <div className="w-full flex h-[100%] flex-col">
         {shouldShowAdd && <AddQuestionDialog />}
-        {shouldShowDelete && <DeleteQuestionDialog/>}
+        {shouldShowDelete && <DeleteQuestionDialog />}
+        
         {
             (isLoading || quiz === null)
                 ? <div className="w-full h-[300px] flex items-center justify-center">
                     <p className="text-xl">Loading Quiz</p>
                 </div>
-                : <div className="">
+
+                : <div className="flex flex-col flex-1">
                     <div className="flex justify-between items-center">
                         <p className="text-xl">Editing - {quiz.title}</p>
                         {quiz.questions.length > 0 && <TextButton text="Add a question" clickHandler={showAddDialog} />}
@@ -36,9 +38,11 @@ const EditQuiz: FC = () => {
 
                     {
                         quiz.questions.length === 0
-                            ? <div className="flex flex-col items-center mt-8">
-                                <p>This quiz doesn't have any questions</p>
-                                <TextButton text="Add a question!" clickHandler={showAddDialog} />
+                            ? <div className="flex flex-col flex-1 justify-center items-center ">
+                                <div className="flex flex-col w-fit p-8 items-center gap-8 rounded-md border-2 border-primary-500 border-dotted">
+                                    <p className="text-2xl">This quiz has no questions</p>
+                                    <TextButton text="Add a question!" clickHandler={showAddDialog} />
+                                </div>
                             </div>
                             : <div className="flex flex-col mt-4 gap-4">
                                 {

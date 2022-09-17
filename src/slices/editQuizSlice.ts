@@ -83,12 +83,26 @@ const editQuizSlice = createSlice({
             state.shouldShowAdd = action.payload
         },
 
+        setError(state, action: PayloadAction<[boolean, string]>) {
+            state.isError = action.payload[0]
+            state.error = action.payload[1]
+        },
+
+        setLoading(state, action: PayloadAction<[boolean, string]>) {
+            state.isLoading = action.payload[0]
+            state.loading = action.payload[1]
+        },
 
         setQuizId(state, action: PayloadAction<string>) {
             state.quizId = action.payload
         },
         setQuestionType(state, action: PayloadAction<QuestionType>) {
             state.questionType = action.payload
+            if (action.payload === QuestionType.Boolean) {
+                state.correctAnswer = "true"
+            } else {
+                state.correctAnswer = ""
+            }
         },
         setQuestion(state, action: PayloadAction<string>) {
             state.question = action.payload
@@ -109,6 +123,24 @@ const editQuizSlice = createSlice({
         },
         setQuestionToDelete(state, action: PayloadAction<string>) {
             state.questionToDelete = action.payload
+        },
+
+        resetAddDialog(state, action: PayloadAction<void>) {
+            state.isError = false
+            state.error = null
+            state.correctAnswer = ""
+            state.question = ""
+            state.choiceOptions = {
+                option1: "",
+                option2: "",
+                option3: "",
+                option4: "",
+            }
+            state.questionType = QuestionType.Choice
+        },
+
+        resetDeleteDialog(state, action: PayloadAction<void>) {
+            state.questionToDelete = null
         }
         
     },
