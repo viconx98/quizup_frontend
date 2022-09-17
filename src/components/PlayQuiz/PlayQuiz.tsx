@@ -18,7 +18,7 @@ const PlayQuiz: FC = () => {
 
     const [searchParams] = useSearchParams()
 
-    const { status, socketConnected, question, data, completedQuiz } = useAppSelector(state => state.playQuiz)
+    const { status, socketConnected, question, data, pickedAnswer, disableAnswers, completedQuiz } = useAppSelector(state => state.playQuiz)
 
     useEffect(() => {
         const pin = searchParams.get("pin")
@@ -61,27 +61,38 @@ const PlayQuiz: FC = () => {
                 dispatch(playQuizActions.setStatus("completed"))
                 dispatch(playQuizActions.setCompletedQuiz(data))
             })
+            
+            socket.on(Events.AnswerSubmitted, (data) => {
+                dispatch(playQuizActions.setDisableAnswers(true))
+            })
+            
+            socket.on(Events.NewQuestion, (data) => {
+                dispatch(playQuizActions.setDisableAnswers(false))
+                dispatch(playQuizActions.setPickedAnswer(""))
+                dispatch(playQuizActions.setQuestion(data.question))
+            })
         }
-
+        
         return () => {
             if (socket !== null) {
                 socket.off(Events.QuizJoined)
                 socket.off(Events.QuizStarted)
                 socket.off(Events.QuizCompleted)
+                socket.off(Events.AnswerSubmitted)
             }
         }
     }, [socketConnected])
-
+    
     const joinQuiz = () => {
         const username = nameRef.current.value
         if (username === "") return
-
+        
         socket!.emit(Events.JoinQuiz, {
             username: username,
             roomPin: pinRef.current.value
         })
     }
-
+    
     const submitAnswer = (answer: string) => {
         const answerData: any = {
             roomPin: data.roomPin,
@@ -89,32 +100,53 @@ const PlayQuiz: FC = () => {
             answer: answer,
             playerId: data.player.socketId
         }
-
+        
         socket?.emit(Events.SubmitAnswer, answerData)
+        dispatch(playQuizActions.setPickedAnswer(answer))
     }
-
+    
     const renderQuiz = () => {
         switch (status) {
             case "join":
                 return <div className="w-[300px] h-fit flex flex-col items-center p-4 gap-4 bg-l_backgroundLight dark:bg-d_backgroundLight">
-                    <TextField inputRef={nameRef} title="Game pin" noLabel placeholder="Name" />
+                    <TextField defaultValue={"sdfsdfsdfsf"} inputRef={nameRef} title="Game pin" noLabel placeholder="Name" />
                     <TextField defaultValue={defultPin} inputRef={pinRef} title="Game pin" noLabel placeholder="Game pin" />
                     <Button text="Join" variant="filled" clickHandler={joinQuiz} />
                 </div>
             case "waiting":
-                return <div className="w-[300px] h-fit flex flex-col items-center p-4 gap-4 bg-l_backgroundLight dark:bg-d_backgroundLight">
-                    <p>Waiting for admin to start the quiz</p>
+                return <div className="w-fit h-fit flex flex-col items-center p-4 gap-4 bg-l_backgroundLight dark:bg-d_backgroundLight rounded-md">
+                    <img src={data.player.avatar} className="h-[128px] w-[128px]" alt="" />
+                    <p className="text-2xl">{data.player.username}</p>
+                    <p className="text-gray-500">Waiting for admin to start the game</p>
                 </div>
 
             case "playing":
-                return <div className="w-full h-screen flex flex-col items-center p-4 gap-4 bg-l_backgroundLight dark:bg-d_backgroundLight">
-                    <h1 className="text-lg">{question.question}</h1>
+                return <div className="w-full h-screen flex flex-col p-4 gap-4 bg-l_background dark:bg-d_background">
+                    <div className="flex items-center gap-4 p-2 w-full rounded-md bg-l_backgroundLight dark:bg-d_backgroundLight">
+                        <img src={data.player.avatar} className="h-[40px] w-[40px]" alt="" />
+                        <p className="text-2xl">{data.player.username}</p>
+                        <p className="ml-auto">Question 1 / 10</p>
+                    </div>
 
-                    {
-                        question.options.map((opt: string) => {
-                            return <div onClick={e => submitAnswer(opt)}>{opt}</div>
-                        })
-                    }
+                    <p className="text-4xl">
+                        {question.question}
+                    </p>
+
+                    {/* <h1 className="text-lg">{question.question}</h1> */}
+
+                    <div className="flex flex-col gap-4">
+                        {
+                            disableAnswers
+                                ? question.options.map((opt: string) => {
+                                    const bgColor = pickedAnswer === opt ? "bg-green-600/30 dark:bg-green-600/30" : "bg-l_backgroundLighter dark:bg-d_backgroundLighter" 
+
+                                    return <div className={"p-4 text-2xl rounded-md " + bgColor}>{opt}</div>
+                                })
+                                : question.options.map((opt: string) => {
+                                    return <div className="p-4 text-2xl rounded-md cursor-pointer bg-l_backgroundLighter dark:bg-d_backgroundLighter" onClick={e => submitAnswer(opt)}>{opt}</div>
+                                })
+                        }
+                    </div>
                 </div>
             case "completed":
                 return <div className="w-full h-screen flex flex-col items-center p-4 gap-4 bg-l_backgroundLight dark:bg-d_backgroundLight">
@@ -136,4 +168,5 @@ const PlayQuiz: FC = () => {
     </div>
 }
 
-export default PlayQuiz 
+export default PlayQuiz
+

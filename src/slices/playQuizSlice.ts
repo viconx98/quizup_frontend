@@ -11,6 +11,8 @@ interface PlayQuizState extends SliceState {
     data: any;
     question: any;
     completedQuiz: any;
+    disableAnswers: boolean;
+    pickedAnswer: string;
 }
 
 // TODO: Load preference from local storage
@@ -23,7 +25,9 @@ const initialState: PlayQuizState = {
     data: null,
     question: null,
     socketConnected: false,
-    completedQuiz: null
+    completedQuiz: null,
+    disableAnswers: false,
+    pickedAnswer: ""
 }
 
 const playQuizSlice = createSlice({
@@ -45,6 +49,12 @@ const playQuizSlice = createSlice({
         setQuestion(state, action) {
             state.question = action.payload
         },
+        setDisableAnswers(state, action: PayloadAction<boolean>) {
+            state.disableAnswers = action.payload
+        },
+        setPickedAnswer(staet, action: PayloadAction<string>) {
+            staet.pickedAnswer = action.payload
+        }
     }
 })
 

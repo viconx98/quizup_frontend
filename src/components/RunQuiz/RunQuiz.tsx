@@ -78,6 +78,10 @@ const RunQuiz: FC = () => {
                     dispatch(runQuizActions.setQuizRoom(data))
                 })
 
+                socket.on(Events.NewQuestion, (data) => {
+                    dispatch(runQuizActions.setQuizRoom(data))
+                })
+
                 socket.on(Events.QuizCompleted, (data) => {
                     dispatch(runQuizActions.setQuizRoom(data))
                 })
@@ -92,6 +96,7 @@ const RunQuiz: FC = () => {
                 socket.off(Events.PlayerJoined)
                 socket.off(Events.QuizStarted)
                 socket.off(Events.QuizCompleted)
+                socket.off(Events.NewQuestion)
             }
         }
     }, [socketConnected])
@@ -100,6 +105,7 @@ const RunQuiz: FC = () => {
         socket!.emit(Events.StartQuiz, quizRoom?.pin)
     }
 
+    // Count how many people picked a particular question
     const getAnswerCount = (answer: string, questionId: string) => {
         const answers = quizRoom!.answerData[questionId]
         let count = 0
@@ -129,14 +135,14 @@ const RunQuiz: FC = () => {
                         <div className="flex flex-col flex-1 bg-l_backgroundLight dark:bg-d_backgroundLight p-4 rounded-md shadow-md">
                             <p>Players</p>
                             <div className="flex flex-col gap-4">
-                            {
-                                quizRoom.players.map(player => {
-                                    return <div className="flex gap-4 p-2 items-center rounded-md bg-l_backgroundLighter dark:bg-d_backgroundLighter">
-                                        <img src={player.avatar} alt="player avatar" className="h-[32px] w-[32px]" />
-                                        <p>{player.username}</p>
-                                    </div>
-                                })
-                            }
+                                {
+                                    quizRoom.players.map(player => {
+                                        return <div className="flex gap-4 p-2 items-center rounded-md bg-l_backgroundLighter dark:bg-d_backgroundLighter">
+                                            <img src={player.avatar} alt="player avatar" className="h-[32px] w-[32px]" />
+                                            <p>{player.username}</p>
+                                        </div>
+                                    })
+                                }
                             </div>
                         </div>
 
@@ -163,15 +169,35 @@ const RunQuiz: FC = () => {
                     {quizRoom.players.length > 0 && <Button text="Start Quiz" clickHandler={startQuiz} variant="filled" />}
                 </div>
             case "playing":
-                return <div className="w-full min-h-screen justify-start items-center">
-                    <p>{quizRoom.quiz.questions[quizRoom.currentIndex].question}</p>
+                return <div className="w-full h-screen flex flex-col p-4 gap-4 bg-l_background dark:bg-d_background">
+                    <div className="flex items-center gap-4 p-2 w-full rounded-md bg-l_backgroundLight dark:bg-d_backgroundLight">
+                        <p className="text-2xl">{quizRoom.quiz.title}</p>
+                        <p className="ml-auto"></p>
+                        <Button variant="filled" text="Next Question" clickHandler={nextQuestion} />
 
-                    <p>{quizRoom.quiz.questions[quizRoom.currentIndex].options.map(opt => {
+                    </div>
 
-                        return <p>{opt} {getAnswerCount(opt, quizRoom.quiz.questions[quizRoom.currentIndex]._id)}</p>
-                    })}</p>
+                    <p className="text-4xl">
+                        {quizRoom.quiz.questions[quizRoom.currentIndex].question}
+                    </p>
 
-                    <Button variant="filled" text="Next Question" clickHandler={nextQuestion} />
+                    <div className="flex flex-col gap-4">
+                        {quizRoom.quiz.questions[quizRoom.currentIndex].options.map(opt => {
+                            const answerCount = getAnswerCount(opt, quizRoom.quiz.questions[quizRoom.currentIndex]._id)
+                            const playerCount = quizRoom.players.length
+                            const barWidth = Math.round((answerCount / playerCount) * 100)
+
+                            return <div className="relative w-full rounded-md bg-l_backgroundLight dark:bg-d_backgroundLight">
+                                <div style={{ 
+                                    width: barWidth + "%",
+                                    transition: "width 300ms ease"
+                                }} 
+            
+                                className="absolute top-0 left-0 z-0 h-full rounded-md bg-green-500/30"></div>
+                                <p className="relative p-4 z-10">{opt}</p>
+                            </div>
+                        })}
+                    </div>
                 </div>
             case "completed":
                 return <div>Waiting</div>
