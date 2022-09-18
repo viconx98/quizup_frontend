@@ -1,12 +1,14 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 interface UiState {
-    isDarkTheme: boolean
+    isDarkTheme: boolean;
+    currentTab: string;
 }
 
 // TODO: Load preference from local storage
 const initialState: UiState = {
-    isDarkTheme: true
+    isDarkTheme: true,
+    currentTab: "myquizzes"
 }
 
 const uiSlice = createSlice({
@@ -15,6 +17,9 @@ const uiSlice = createSlice({
     reducers: {
         toggleDarkTheme(state, action: PayloadAction<void>) {
             state.isDarkTheme = !state.isDarkTheme
+        },
+        setTab(state, action: PayloadAction<string>){
+            state.currentTab = action.payload
         }
     }
 })

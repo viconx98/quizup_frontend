@@ -55,24 +55,24 @@ const PlayQuiz: FC = () => {
                 dispatch(playQuizActions.setStatus("playing"))
                 dispatch(playQuizActions.setQuestion(data.question))
             })
-            
+
             socket.on(Events.QuizCompleted, (data) => {
                 console.log("completed")
                 dispatch(playQuizActions.setStatus("completed"))
                 dispatch(playQuizActions.setCompletedQuiz(data))
             })
-            
+
             socket.on(Events.AnswerSubmitted, (data) => {
                 dispatch(playQuizActions.setDisableAnswers(true))
             })
-            
+
             socket.on(Events.NewQuestion, (data) => {
                 dispatch(playQuizActions.setDisableAnswers(false))
                 dispatch(playQuizActions.setPickedAnswer(""))
                 dispatch(playQuizActions.setQuestion(data.question))
             })
         }
-        
+
         return () => {
             if (socket !== null) {
                 socket.off(Events.QuizJoined)
@@ -82,17 +82,17 @@ const PlayQuiz: FC = () => {
             }
         }
     }, [socketConnected])
-    
+
     const joinQuiz = () => {
         const username = nameRef.current.value
         if (username === "") return
-        
+
         socket!.emit(Events.JoinQuiz, {
             username: username,
             roomPin: pinRef.current.value
         })
     }
-    
+
     const submitAnswer = (answer: string) => {
         const answerData: any = {
             roomPin: data.roomPin,
@@ -100,11 +100,32 @@ const PlayQuiz: FC = () => {
             answer: answer,
             playerId: data.player.socketId
         }
-        
+
         socket?.emit(Events.SubmitAnswer, answerData)
         dispatch(playQuizActions.setPickedAnswer(answer))
     }
-    
+
+    const findQuestionById = (questionId: string) => {
+        return completedQuiz.quiz.questions.find((que: any) => que._id === questionId)
+    }
+
+    const countCorrectAnswers = () => {
+        const playerId = data.player.socketId
+        let count = 0
+
+        const answerData = completedQuiz.answerData
+        for (const questionId in answerData) {
+            const playersAnswer = answerData[questionId][playerId]
+            const question = findQuestionById(questionId)
+
+            if (playersAnswer === question.correctAnswer) {
+                count++
+            }
+        }
+
+        return count
+    }
+
     const renderQuiz = () => {
         switch (status) {
             case "join":
@@ -132,13 +153,11 @@ const PlayQuiz: FC = () => {
                         {question.question}
                     </p>
 
-                    {/* <h1 className="text-lg">{question.question}</h1> */}
-
                     <div className="flex flex-col gap-4">
                         {
                             disableAnswers
                                 ? question.options.map((opt: string) => {
-                                    const bgColor = pickedAnswer === opt ? "bg-green-600/30 dark:bg-green-600/30" : "bg-l_backgroundLighter dark:bg-d_backgroundLighter" 
+                                    const bgColor = pickedAnswer === opt ? "bg-green-600/30 dark:bg-green-600/30" : "bg-l_backgroundLighter dark:bg-d_backgroundLighter"
 
                                     return <div className={"p-4 text-2xl rounded-md " + bgColor}>{opt}</div>
                                 })
@@ -150,9 +169,42 @@ const PlayQuiz: FC = () => {
                 </div>
             case "completed":
                 return <div className="w-full h-screen flex flex-col items-center p-4 gap-4 bg-l_backgroundLight dark:bg-d_backgroundLight">
-                    {
-                        JSON.stringify(completedQuiz)
-                    }
+                    <p className="text-4xl">Quiz is complete!</p>
+                    <img src={data.player.avatar} className="h-[128px] w-[128px]" alt="" />
+                    <p className="text-2xl">{data.player.username}</p>
+                    <p>You scored {countCorrectAnswers()} / {completedQuiz.quiz.questions.length}</p>
+
+                    <div className="flex h-[300px] gap-4">
+                        {
+                            completedQuiz.top[1] !== undefined
+                            && <div className="flex flex-col items-center">
+                                <p className="mt-auto"></p>
+                                <img src={completedQuiz.top[1].avatar} className="h-[64px] w-[64px]" alt="" />
+                                <p>{completedQuiz.top[1].username}</p>
+                                <div className="w-full h-[150px] bg-gray-500 rounded-md"></div>
+                            </div>
+                        }
+
+                        {
+                            completedQuiz.top[0] !== undefined
+                            && <div className="flex flex-col items-center">
+                                <p className="mt-auto"></p>
+                                <img src={completedQuiz.top[0].avatar} className="h-[64px] w-[64px]" alt="" />
+                                <p>{completedQuiz.top[0].username}</p>
+                                <div className="w-full h-[200px] bg-amber-500 rounded-md"></div>
+                            </div>
+                        }
+
+                        {
+                            completedQuiz.top[2] !== undefined
+                            && <div className="flex flex-col items-center">
+                                <p className="mt-auto"></p>
+                                <img src={completedQuiz.top[2].avatar} className="h-[64px] w-[64px]" alt="" />
+                                <p>{completedQuiz.top[2].username}</p>
+                                <div className="w-full h-[100px] bg-amber-800 rounded-md"></div>
+                            </div>
+                        }
+                    </div>
                 </div>
         }
 

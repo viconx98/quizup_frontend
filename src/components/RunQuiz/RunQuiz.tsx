@@ -5,6 +5,7 @@ import { Events } from "../../types/events";
 import { useAppDispatch, useAppSelector } from '../../types/hooks';
 import io, { Socket } from "socket.io-client"
 import Button from "../reusable/Button";
+import TextButton from "../reusable/TextButton";
 
 const RunQuiz: FC = () => {
     const dispatch = useAppDispatch()
@@ -172,6 +173,7 @@ const RunQuiz: FC = () => {
                 return <div className="w-full h-screen flex flex-col p-4 gap-4 bg-l_background dark:bg-d_background">
                     <div className="flex items-center gap-4 p-2 w-full rounded-md bg-l_backgroundLight dark:bg-d_backgroundLight">
                         <p className="text-2xl">{quizRoom.quiz.title}</p>
+                        <p className="text-2xl">| {quizRoom.players.length} Players</p>
                         <p className="ml-auto"></p>
                         <Button variant="filled" text="Next Question" clickHandler={nextQuestion} />
 
@@ -188,19 +190,60 @@ const RunQuiz: FC = () => {
                             const barWidth = Math.round((answerCount / playerCount) * 100)
 
                             return <div className="relative w-full rounded-md bg-l_backgroundLight dark:bg-d_backgroundLight">
-                                <div style={{ 
+                                <div style={{
                                     width: barWidth + "%",
                                     transition: "width 300ms ease"
-                                }} 
-            
-                                className="absolute top-0 left-0 z-0 h-full rounded-md bg-green-500/30"></div>
+                                }}
+
+                                    className="absolute top-0 left-0 z-0 h-full rounded-md bg-green-500/30"></div>
                                 <p className="relative p-4 z-10">{opt}</p>
                             </div>
                         })}
                     </div>
                 </div>
             case "completed":
-                return <div>Waiting</div>
+                return <div className="w-full h-screen flex flex-col items-center p-4 gap-4 bg-l_backgroundLight dark:bg-d_backgroundLight">
+                    <p className="text-4xl">Quiz is complete!</p>
+
+                    <div className="w-full flex flex-col gap-4">
+                        {
+                            quizRoom.top.map((player: any) => {
+                                const totalQuestions = quizRoom.quiz.questions.length
+                                const incorrectAnswers = totalQuestions - player.correctAnswers
+
+                                const incorrectWidth = Math.round((incorrectAnswers / totalQuestions) * 100)
+                                const correctWidth = Math.round((player.correctAnswers / totalQuestions) * 100)
+
+                                console.log(totalQuestions, incorrectAnswers, incorrectWidth, correctWidth)
+
+                                return <div className="overflow-hidden flex w-full bg-l_backgroundLighter dark:bg-d_backgroundLighter rounded-md">
+                                    <div className="flex flex-col items-center px-2 gap-2">
+                                        <img src={player.avatar} className="h-[48px] w-[48px]" />
+                                        <p>{player.username}</p>
+                                    </div>
+
+                                    {
+                                        player.correctAnswers > 0
+                                        && <div style={{ width: correctWidth + "%" }} className="flex items-center justify-center text-2xl font-bold bg-green-500/50 h-full">
+                                            {
+                                                player.correctAnswers
+                                            }
+                                        </div>
+                                    }
+
+                                    {
+                                        incorrectAnswers > 0
+                                        && <div style={{ width: incorrectWidth + "%" }} className="flex items-center justify-center text-2xl font-bold bg-red-500/50 h-full">
+                                            {
+                                                incorrectAnswers
+                                            }
+                                        </div>
+                                    }
+                                </div>
+                            })
+                        }
+                    </div>
+                </div>
         }
 
         return <h1>Everything went wrong</h1>

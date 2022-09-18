@@ -1,5 +1,12 @@
+import { useNavigate } from "react-router-dom"
+import { uiActions } from "../../slices/uiSlice"
+import { useAppDispatch, useAppSelector } from "../../types/hooks"
 
 export default function NavBar() {
+    const dispatch = useAppDispatch()
+    const { currentTab } = useAppSelector(state => state.ui)
+    const navigate = useNavigate()
+
     const options = [
         {
             id: "myquizzes",
@@ -14,6 +21,17 @@ export default function NavBar() {
         }
     ]
 
+    const handleNavItemClick = (tabId: string) => {
+        dispatch(uiActions.setTab(tabId))
+        if (tabId === "myquizzes") {
+            navigate("/")
+        } else if (tabId === "logout") {
+            
+        } else {
+            navigate(tabId)
+        }
+    }
+
     return <div className="w-full h-16 fixed bg-l_backgroundLight dark:bg-d_backgroundLight flex justify-center shadow-md">
         <div className="max-w-[1300px] w-full h-16 bg-l_backgroundLight dark:bg-d_backgroundLight flex items-center">
             <div>
@@ -22,9 +40,16 @@ export default function NavBar() {
 
             {/* TODO: Styling */}
             <div className="flex ml-auto gap-8 items-center cursor-pointer">
-                {options.map(op => <p id={op.id} key={op.id}>
-                    {op.title}
-                </p>)}
+                {
+                    options.map(op => {
+                        const tabStyle = currentTab === op.id ? "p-2 rounded-md bg-l_backgroundLighter dark:bg-d_backgroundLighter" : "p-2 rounded-md"
+
+                        return <p id={op.id} key={op.id} onClick={e => handleNavItemClick(op.id)} className={tabStyle}>
+                            {op.title}
+                        </p>
+                    }
+                    )
+                }
             </div>
         </div>
     </div>
