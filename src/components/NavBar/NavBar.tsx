@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom"
+import { authActions, authAsyncActions } from "../../slices/authSlice"
 import { uiActions } from "../../slices/uiSlice"
 import { useAppDispatch, useAppSelector } from "../../types/hooks"
 
@@ -22,12 +23,14 @@ export default function NavBar() {
     ]
 
     const handleNavItemClick = (tabId: string) => {
-        dispatch(uiActions.setTab(tabId))
         if (tabId === "myquizzes") {
+            dispatch(uiActions.setTab(tabId))
             navigate("/")
         } else if (tabId === "logout") {
-            
+            dispatch(authAsyncActions.logout())
+            navigate("/signin")
         } else {
+            dispatch(uiActions.setTab(tabId))
             navigate(tabId)
         }
     }

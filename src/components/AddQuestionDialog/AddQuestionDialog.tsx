@@ -7,6 +7,7 @@ import { QuestionType } from "../../types/myquizzes"
 import { editQuizActions, editQuizAsyncActions } from "../../slices/editQuizSlice"
 import OptionField from "../reusable/OptionField"
 import * as Yup from "yup"
+import { MdImage, MdDelete } from "react-icons/md"
 
 const choiceQuestionValidation = Yup.object().shape({
     quizId: Yup.string()
@@ -58,7 +59,7 @@ const booleanQuestionValidation = Yup.object().shape({
 
 const AddQuestionDialog: FC = () => {
     const dispatch = useAppDispatch()
-    const { quizId, questionType, choiceOptions, correctAnswer, question, isError, error } = useAppSelector(state => state.editQuiz)
+    const { quizId, questionType, choiceOptions, correctAnswer, question, image, isUploadingImage, isError, error } = useAppSelector(state => state.editQuiz)
 
 
     useEffect(() => {
@@ -112,7 +113,6 @@ const AddQuestionDialog: FC = () => {
 
 
     const addQuestion = async () => {
-        // TODO: Validation
         const requestData: any = {
             quizId: quizId,
             questionData: {
@@ -141,9 +141,43 @@ const AddQuestionDialog: FC = () => {
         }
     }
 
+    const uploadImage = (event: any) => {
+        if (isUploadingImage) return
+
+        const formData = new FormData()
+        formData.append("image", event.target.files[0])
+
+        dispatch(editQuizAsyncActions.uploadQuestionImage(formData))
+
+    }
+
+    const removeImage = (event: any) => {
+        dispatch(editQuizActions.removeImage())
+    }
+
     return <div className="absolute flex w-full h-full top-0 left-0 items-center justify-center backdrop-blur-sm">
         <div className="flex flex-col min-w-[400px] min-h-[300px] items-center p-4 rounded-md shadow-md bg-l_backgroundLight dark:bg-d_backgroundLight gap-4">
             <p>Add a new question</p>
+
+            <div className="flex flex-col gap-4 items-center">
+                {
+                    image === null
+                    && <div>
+                        <label htmlFor="questionImage" className="flex  items-center gap-2 bg-primary-600/50 p-2 rounded-md cursor-pointer">
+                            <MdImage />
+                            <p>Pick an image</p>
+                        </label>
+                        <input id="questionImage" className="hidden" type="file" accept="image/*" onChange={uploadImage} />
+                    </div>
+                }
+                {
+                    image
+                    && <div className="flex gap-4 items-center" >
+                        <img src={image} alt="" className="h-[100px] w-[100px] rounded-md" />
+                        <MdDelete size={24} className="cursor-pointer" onClick={removeImage} />
+                    </div>
+                }
+            </div>
 
             <TextField title="Quiz title" placeholder="Type a question..." icon={null} onChange={(e) => dispatch(editQuizActions.setQuestion(e.target.value))} noLabel />
 
@@ -163,11 +197,17 @@ const AddQuestionDialog: FC = () => {
 
             {
                 questionType === QuestionType.Choice
-                && <div className="w-[150px] flex flex-col gap-4">
-                    <OptionField placeholder="Option 1" onChange={onChoiceChange} onSelected={onCorrectAnswerChange} inputId="option1" groupName="option" />
-                    <OptionField placeholder="Option 2" onChange={onChoiceChange} onSelected={onCorrectAnswerChange} inputId="option2" groupName="option" />
-                    <OptionField placeholder="Option 3" onChange={onChoiceChange} onSelected={onCorrectAnswerChange} inputId="option3" groupName="option" />
-                    <OptionField placeholder="Option 4" onChange={onChoiceChange} onSelected={onCorrectAnswerChange} inputId="option4" groupName="option" />
+                && <div className="w-fit flex flex-col gap-4">
+                    <div className="flex gap-4">
+                        <OptionField placeholder="Option 1" onChange={onChoiceChange} onSelected={onCorrectAnswerChange} inputId="option1" groupName="option" />
+                        <OptionField placeholder="Option 2" onChange={onChoiceChange} onSelected={onCorrectAnswerChange} inputId="option2" groupName="option" />
+
+                    </div>
+
+                    <div className="flex gap-4">
+                        <OptionField placeholder="Option 3" onChange={onChoiceChange} onSelected={onCorrectAnswerChange} inputId="option3" groupName="option" />
+                        <OptionField placeholder="Option 4" onChange={onChoiceChange} onSelected={onCorrectAnswerChange} inputId="option4" groupName="option" />
+                    </div>
                 </div>
             }
 

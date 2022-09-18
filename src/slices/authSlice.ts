@@ -37,6 +37,14 @@ const signin = createAsyncThunk(
     }
 )
 
+const logout = createAsyncThunk(
+    "authSlice/logout",
+    () => {
+        localStorage.removeItem("user")
+        return true
+    }
+)
+
 const authSlice = createSlice({
     name: "authSlice",
     initialState: initialState,
@@ -84,10 +92,27 @@ const authSlice = createSlice({
 
             state.error = action.error.message!
         })
+
+        builder.addCase(logout.pending, (state, action) => {
+            state.isLoading = true
+        }).addCase(logout.fulfilled, (state, action) => {
+            state.isLoading = false
+            state.loading = null
+            state.isError = false
+            state.error = null
+            state.user = null
+            state.authComplete = false
+
+        }).addCase(logout.rejected, (state, action) => {
+            state.isLoading = false
+            state.isError = true
+
+            state.error = action.error.message!
+        })
     }
 })
 
 
 export const authActions = { ...authSlice.actions }
-export const authAsyncActions = {signup, signin}
+export const authAsyncActions = { signup, signin, logout }
 export default authSlice.reducer

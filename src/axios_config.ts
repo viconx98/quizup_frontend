@@ -10,6 +10,7 @@ export enum Endpoints {
     AddQuiz = "/quiz/add",
     DeleteQuiz = "/quiz/delete",
     AddQuestion = "/quiz/question/add",
+    UploadQuestionImage = "/quiz/question/uploadImage",
     DeleteQuestion = "/quiz/question/delete",
 }
 

@@ -15,7 +15,9 @@ interface EditQuizState extends SliceState {
     questionType: QuestionType;
     shouldShowAdd: boolean;
     shouldShowDelete: boolean;
-    questionToDelete: string | null
+    questionToDelete: string | null;
+    image: string | null;
+    isUploadingImage: boolean;
 }
 
 const initialState: EditQuizState = {
@@ -27,6 +29,8 @@ const initialState: EditQuizState = {
     quiz: null,
     shouldShowAdd: false,
     shouldShowDelete: false,
+    image: null,
+    isUploadingImage: false,
 
     // For adding questions
     question: "",
@@ -58,6 +62,20 @@ const addQuestion = createAsyncThunk(
         const response = await axiosClient.post(Endpoints.AddQuestion, data)
 
         return response.data as Question
+    }
+)
+
+const uploadQuestionImage = createAsyncThunk(
+    "editQuizSlice/uploadQuestionImage",
+    async (formData: FormData) => {
+        const response = await axiosClient.post(Endpoints.UploadQuestionImage, formData, {
+            headers: {
+                "Content-Type": 'multipart/form-data'
+            }
+        })
+
+        console.log(response.data)
+        return response.data.fileUrl
     }
 )
 
@@ -141,6 +159,11 @@ const editQuizSlice = createSlice({
 
         resetDeleteDialog(state, action: PayloadAction<void>) {
             state.questionToDelete = null
+        },
+
+        removeImage(state, action: PayloadAction<void>) {
+            state.image = null
+            state.isUploadingImage = false
         }
         
     },
@@ -174,6 +197,24 @@ const editQuizSlice = createSlice({
             state.error = action.error.message!
         })
 
+        builder.addCase(uploadQuestionImage.pending, (state, action) => {
+            state.isLoading = true
+            state.isUploadingImage = true
+        }).addCase(uploadQuestionImage.fulfilled, (state, action) => {
+            state.isUploadingImage = false
+            state.isLoading = false
+            state.isError = false
+            
+            state.image = action.payload
+            
+        }).addCase(uploadQuestionImage.rejected, (state, action) => {
+            state.isUploadingImage = false
+            state.isLoading = false
+            state.isError = true
+
+            state.error = action.error.message!
+        })
+
         builder.addCase(deleteQuestion.pending, (state, action) => {
             state.isLoading = true
         }).addCase(deleteQuestion.fulfilled, (state, action) => {
@@ -194,5 +235,5 @@ const editQuizSlice = createSlice({
 })
 
 export const editQuizActions = { ...editQuizSlice.actions }
-export const editQuizAsyncActions = { loadQuiz, addQuestion, deleteQuestion }
+export const editQuizAsyncActions = { loadQuiz, addQuestion, deleteQuestion, uploadQuestionImage }
 export default editQuizSlice.reducer
