@@ -20,7 +20,7 @@ const RunQuiz: FC = () => {
 
     const params = useParams()
 
-    const baseUrl = process.env.REACT_APP_BACKEND_URL
+    const baseUrl = process.env.REACT_APP_FRONTEND_URL
 
     // TODO: Validation for invalid quizId
     useEffect(() => {
