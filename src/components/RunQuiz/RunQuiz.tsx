@@ -24,10 +24,9 @@ const RunQuiz: FC = () => {
 
     // TODO: Validation for invalid quizId
     useEffect(() => {
-        console.log("useEffect")
         dispatch(runQuizActions.setQuizId(params.quizId!))
 
-        let tempSocket = io("http://localhost:3001")
+        let tempSocket = io(process.env.REACT_APP_BACKEND_URL! )
 
         tempSocket.on("connect", () => {
             try {
@@ -51,10 +50,10 @@ const RunQuiz: FC = () => {
             tempSocket!.off("connect_error")
             tempSocket.off("connect")
         }
+        // eslint-disable-next-line
     }, [])
 
     useEffect(() => {
-        console.log("useEffect [socketConnected]")
 
         if (quizId !== "") {
             if (socketConnected && socket !== null) {
@@ -66,7 +65,6 @@ const RunQuiz: FC = () => {
                 socket.emit(Events.RunQuiz, requestData)
 
                 socket.on(Events.QuizCreated, (data) => {
-                    console.log("Events.QuizCreated")
                     dispatch(runQuizActions.setQuizRoom(data))
 
                     setTimeout(() => {
@@ -76,17 +74,14 @@ const RunQuiz: FC = () => {
                 })
 
                 socket.on(Events.PlayerJoined, (data) => {
-                    console.log("Events.PlayerJoined")
                     dispatch(runQuizActions.setQuizRoom(data))
                 })
 
                 socket.on(Events.QuizStarted, (data) => {
-                    console.log("Events.QuizStarted", data)
                     dispatch(runQuizActions.setQuizRoom(data))
                 })
 
                 socket.on(Events.AnswerSubmitted, (data) => {
-                    console.log("Events.AnswerSubmitted", data)
                     dispatch(runQuizActions.setQuizRoom(data))
                 })
 
@@ -103,7 +98,6 @@ const RunQuiz: FC = () => {
         }
 
         return () => {
-            console.log("useEffect [socketConnected] cleanup")
             if (socket !== null) {
                 socket.off(Events.RunQuiz)
                 socket.off(Events.QuizCreated)
@@ -113,6 +107,7 @@ const RunQuiz: FC = () => {
                 socket.off(Events.NewQuestion)
             }
         }
+        // eslint-disable-next-line
     }, [socketConnected])
 
     const startQuiz = () => {
@@ -129,6 +124,13 @@ const RunQuiz: FC = () => {
         }
 
         return count
+    }
+
+    const hasEveryoneAnswered = () => {
+        const currentQuestion = quizRoom?.quiz.questions[quizRoom.currentIndex]
+        const answersSoFar = Object.keys(quizRoom?.answerData[currentQuestion?._id!]).length
+ 
+        return answersSoFar === quizRoom?.players.length
     }
 
     const nextQuestion = () => {
@@ -242,6 +244,12 @@ const RunQuiz: FC = () => {
                             </div>
                         </div>
                     </div>
+
+                    {
+                        hasEveryoneAnswered()
+                        && <p className="text-2xl w-full text-center text-green-500">Everyone has answered!</p>
+                    }
+                    
                 </div>
             case "completed":
                 return <div className="w-full h-screen flex flex-col items-center p-4 gap-4 bg-l_backgroundLight dark:bg-d_backgroundLight">
@@ -256,11 +264,9 @@ const RunQuiz: FC = () => {
                                 const incorrectWidth = Math.round((incorrectAnswers / totalQuestions) * 100)
                                 const correctWidth = Math.round((player.correctAnswers / totalQuestions) * 100)
 
-                                console.log(totalQuestions, incorrectAnswers, incorrectWidth, correctWidth)
-
                                 return <div className="overflow-hidden flex w-full bg-l_backgroundLighter dark:bg-d_backgroundLighter rounded-md">
                                     <div className="flex flex-col items-center px-2 gap-2 min-w-[100px] max-w-[100px]">
-                                        <img src={player.avatar} className="h-[48px] w-[48px]" />
+                                        <img src={player.avatar} className="h-[48px] w-[48px]" alt="question" />
                                         <p>{player.username}</p>
                                     </div>
 
@@ -292,10 +298,9 @@ const RunQuiz: FC = () => {
                 </div>
         }
 
-        return <h1>Everything went wrong</h1>
+        return <h1>Setting things up</h1>
     }
 
-    console.log("RunQuiz render")
     return <div className="w-full min-h-screen bg-l_background dark:bg-d_background">
         {
             socketConnected

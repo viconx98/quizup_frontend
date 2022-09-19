@@ -189,12 +189,12 @@ const AddQuestionDialog: FC = () => {
             <div className="flex gap-4">
                 <div className="flex gap-2">
                     <input id="choice" defaultChecked name="qType" type="radio" onChange={onTypeChange} />
-                    <p>Choice</p>
+                    <p className="text-xl">Choice</p>
                 </div>
 
                 <div className="flex gap-2">
                     <input id="boolean" name="qType" type="radio" onChange={onTypeChange} />
-                    <p>Boolean</p>
+                    <p className="text-xl">Boolean</p>
                 </div>
             </div>
 
@@ -217,14 +217,14 @@ const AddQuestionDialog: FC = () => {
 
             {
                 questionType === QuestionType.Boolean
-                && <div className="w-[100px] flex gap-4">
+                && <div className="w-fit flex gap-4">
                     <div className="flex gap-2">
                         <input defaultChecked id="true" name="boolOption" type="radio" onChange={onCorrectAnswerChange} />
-                        <p>True</p>
+                        <p className="text-xl">True</p>
                     </div>
                     <div className="flex gap-2">
                         <input id="false" name="boolOption" type="radio" onChange={onCorrectAnswerChange} />
-                        <p>False</p>
+                        <p className="text-xl">False</p>
                     </div>
                 </div>
             }

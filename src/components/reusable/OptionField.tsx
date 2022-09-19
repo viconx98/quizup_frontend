@@ -14,7 +14,7 @@ const OptionField: FC<OptionFieldProps> = ({ inputId, placeholder, groupName, on
         <div className="flex items-center gap-2">
             <input id={inputId} placeholder={placeholder} type="text"
                 onChange={onChange!}
-                className="w-[150px] rounded text-lg text-l_text p-2 border-2 bg-l_input dark:bg-d_input" />
+                className="w-[150px] rounded text-xl text-l_text p-2 border-2 bg-l_input dark:bg-d_input" />
             
             <input type="radio" value={inputId} name={groupName} onChange={onSelected!} />
         </div>

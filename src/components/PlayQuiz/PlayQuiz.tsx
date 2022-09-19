@@ -1,4 +1,4 @@
-import { FC, JSXElementConstructor, ReactElement, ReactFragment, ReactPortal, useEffect, useRef, useState } from "react"
+import { FC, useEffect, useRef, useState } from "react"
 import { IoMdMoon, IoMdSunny } from "react-icons/io"
 import { useSearchParams } from "react-router-dom"
 import io, { Socket } from "socket.io-client"
@@ -30,7 +30,7 @@ const PlayQuiz: FC = () => {
             setDefaultPin(pin)
         }
 
-        let tempSocket = io("http://localhost:3001")
+        let tempSocket = io(process.env.REACT_APP_BACKEND_URL!)
 
         tempSocket.on("connect", () => {
             dispatch(playQuizActions.setSocketConnected(true))
@@ -46,6 +46,7 @@ const PlayQuiz: FC = () => {
             if (socket !== null) socket.off("connect")
             tempSocket.off("connect")
         }
+        // eslint-disable-next-line
     }, [])
 
     useEffect(() => {
@@ -61,7 +62,6 @@ const PlayQuiz: FC = () => {
             })
 
             socket.on(Events.QuizCompleted, (data) => {
-                console.log("completed")
                 dispatch(playQuizActions.setStatus("completed"))
                 dispatch(playQuizActions.setCompletedQuiz(data))
             })
@@ -85,6 +85,7 @@ const PlayQuiz: FC = () => {
                 socket.off(Events.AnswerSubmitted)
             }
         }
+        // eslint-disable-next-line
     }, [socketConnected])
 
     const joinQuiz = () => {
@@ -141,7 +142,7 @@ const PlayQuiz: FC = () => {
                 </div>
             case "waiting":
                 return <div className="w-fit h-fit flex flex-col items-center p-4 gap-4 bg-l_backgroundLight dark:bg-d_backgroundLight rounded-md">
-                    <img src={data.player.avatar} className="h-[128px] w-[128px]" alt="" />
+                    <img src={data.player.avatar} className="h-[128px] w-[128px]" alt="question" />
                     <p className="text-2xl">{data.player.username}</p>
                     <p className="text-gray-500">Waiting for admin to start the game</p>
                 </div>
