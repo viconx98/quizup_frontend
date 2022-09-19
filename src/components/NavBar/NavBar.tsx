@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom"
 import { authActions, authAsyncActions } from "../../slices/authSlice"
 import { uiActions } from "../../slices/uiSlice"
 import { useAppDispatch, useAppSelector } from "../../types/hooks"
+import AppLogo from "../AppLogo/AppLogo"
 
 export default function NavBar() {
     const dispatch = useAppDispatch()
@@ -37,8 +38,8 @@ export default function NavBar() {
 
     return <div className="w-full h-16 fixed bg-l_backgroundLight dark:bg-d_backgroundLight flex justify-center shadow-md">
         <div className="max-w-[1300px] w-full h-16 bg-l_backgroundLight dark:bg-d_backgroundLight flex items-center">
-            <div>
-                QuizUp
+            <div className="mt-2">
+                <AppLogo/>
             </div>
 
             {/* TODO: Styling */}

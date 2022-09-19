@@ -24,8 +24,13 @@ const QuestionCard: FC<QuestionProps> = ({ question }) => {
                 ? <BsFillDice2Fill size={24} />
                 : <BsFillDice4Fill size={24} />
         }
-        <div className="w-[100px] h-[100px] bg-primary-500 rounded-md">
-        </div>
+
+        {
+            question.image
+            ? <img src={question.image} alt="" className="w-[100px] h-[100px] rounded-md" />
+            : <div className="w-[100px] h-[100px] rounded-md bg-primary-600"> </div> 
+        } 
+        
         <div className="flex flex-col gap-4 justify-between">
             <p className="text-lg">{question.question}</p>
 
@@ -34,13 +39,13 @@ const QuestionCard: FC<QuestionProps> = ({ question }) => {
                     question.options.map(option => {
                         const color = option === question.correctAnswer ? "bg-green-500/25" : "bg-red-500/25"
 
-                        return <p className={`p-2 ${color} rounded-md`}>{option}</p>
+                        return <p className={`p-2 min-w-[100px] ${color} rounded-md`}>{option}</p>
                     })
                 }
 
             </div>
         </div>
-
+        
         <div className="ml-auto">
             <IconButton icon={<MdDelete />} clickHandler={deleteQuestion} />
         </div>

@@ -122,6 +122,10 @@ const AddQuestionDialog: FC = () => {
             }
         }
 
+        if (image !== null) {
+            requestData.questionData.image = image
+        }
+
         if (questionType === QuestionType.Choice) {
             requestData.questionData.options = Object.values(choiceOptions)
         } else {

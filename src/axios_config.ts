@@ -1,7 +1,8 @@
 import axios from "axios"
 
+const baseUrl = process.env.REACT_APP_BACKEND_URL 
+
 export enum Endpoints {
-    Base = "http://localhost:3001",
     Signin = "/auth/signin",
     Signup = "/auth/signup",
     RefreshToken = "/auth/refreshToken",
@@ -16,7 +17,7 @@ export enum Endpoints {
 
 
 const axiosClient = axios.create({
-    baseURL: Endpoints.Base
+    baseURL: baseUrl
 })
 
 // Response interceptor to replace default error messages with backend error messages

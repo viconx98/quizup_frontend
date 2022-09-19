@@ -14,7 +14,7 @@ function App() {
 
   const classString = isDarkTheme
     ? "dark " + "w-full h-screen font-poppins text-d_text"
-    : "w-full h-screen text-l_text  font-poppins"
+    : "w-full h-screen text-l_text font-poppins"
 
   return (
     <div className={classString}>
@@ -27,6 +27,7 @@ function App() {
         <Route path='/' element={<Home/>}>
           <Route index element={<MyQuizzes/>} />
           <Route path='/edit' element={<EditQuiz/>} />
+          <Route path='/reports' element={<h1>Reports</h1>} />
         </Route>
       </Routes>
     </div>

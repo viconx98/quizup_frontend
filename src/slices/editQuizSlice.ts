@@ -155,6 +155,8 @@ const editQuizSlice = createSlice({
                 option4: "",
             }
             state.questionType = QuestionType.Choice
+            state.image = null
+            state.isUploadingImage = false
         },
 
         resetDeleteDialog(state, action: PayloadAction<void>) {

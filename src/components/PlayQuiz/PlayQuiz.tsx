@@ -1,9 +1,12 @@
 import { FC, JSXElementConstructor, ReactElement, ReactFragment, ReactPortal, useEffect, useRef, useState } from "react"
+import { IoMdMoon, IoMdSunny } from "react-icons/io"
 import { useSearchParams } from "react-router-dom"
 import io, { Socket } from "socket.io-client"
 import { playQuizActions } from "../../slices/playQuizSlice"
+import { uiActions } from "../../slices/uiSlice"
 import { Events } from "../../types/events"
 import { useAppDispatch, useAppSelector } from "../../types/hooks"
+import AppLogo from "../AppLogo/AppLogo"
 import Button from "../reusable/Button"
 import TextField from "../reusable/TextField"
 
@@ -19,6 +22,7 @@ const PlayQuiz: FC = () => {
     const [searchParams] = useSearchParams()
 
     const { status, socketConnected, question, data, pickedAnswer, disableAnswers, completedQuiz } = useAppSelector(state => state.playQuiz)
+    const { isDarkTheme } = useAppSelector(state => state.ui)
 
     useEffect(() => {
         const pin = searchParams.get("pin")
@@ -130,7 +134,8 @@ const PlayQuiz: FC = () => {
         switch (status) {
             case "join":
                 return <div className="w-[300px] h-fit flex flex-col items-center p-4 gap-4 bg-l_backgroundLight dark:bg-d_backgroundLight">
-                    <TextField defaultValue={"sdfsdfsdfsf"} inputRef={nameRef} title="Game pin" noLabel placeholder="Name" />
+                    <AppLogo />
+                    <TextField inputRef={nameRef} title="Game pin" noLabel placeholder="Name" />
                     <TextField defaultValue={defultPin} inputRef={pinRef} title="Game pin" noLabel placeholder="Game pin" />
                     <Button text="Join" variant="filled" clickHandler={joinQuiz} />
                 </div>
@@ -149,24 +154,35 @@ const PlayQuiz: FC = () => {
                         <p className="ml-auto">Question 1 / 10</p>
                     </div>
 
-                    <p className="text-4xl">
-                        {question.question}
-                    </p>
-
-                    <div className="flex flex-col gap-4">
+                    <div className="flex gap-4">
                         {
-                            disableAnswers
-                                ? question.options.map((opt: string) => {
-                                    const bgColor = pickedAnswer === opt ? "bg-green-600/30 dark:bg-green-600/30" : "bg-l_backgroundLighter dark:bg-d_backgroundLighter"
-
-                                    return <div className={"p-4 text-2xl rounded-md " + bgColor}>{opt}</div>
-                                })
-                                : question.options.map((opt: string) => {
-                                    return <div className="p-4 text-2xl rounded-md cursor-pointer bg-l_backgroundLighter dark:bg-d_backgroundLighter" onClick={e => submitAnswer(opt)}>{opt}</div>
-                                })
+                            question.image
+                            && <img src={question.image} alt="" className="max-w-[400px] rounded-md" />
                         }
+
+                        <div className="flex flex-1 flex-col gap-4">
+                            <p className="text-4xl">
+                                {question.question}
+                            </p>
+
+                            <div className="flex flex-col gap-4">
+                                {
+                                    disableAnswers
+                                        ? question.options.map((opt: string) => {
+                                            const bgColor = pickedAnswer === opt ? "bg-green-600/30 dark:bg-green-600/30" : "bg-l_backgroundLight dark:bg-d_backgroundLight"
+
+                                            return <div className={"p-4 text-2xl rounded-md " + bgColor}>{opt}</div>
+                                        })
+                                        : question.options.map((opt: string) => {
+                                            return <div className="p-4 text-2xl rounded-md cursor-pointer bg-l_backgroundLight dark:bg-d_backgroundLight" onClick={e => submitAnswer(opt)}>{opt}</div>
+                                        })
+                                }
+                            </div>
+                        </div>
                     </div>
                 </div>
+
+
             case "completed":
                 return <div className="w-full h-screen flex flex-col items-center p-4 gap-4 bg-l_backgroundLight dark:bg-d_backgroundLight">
                     <p className="text-4xl">Quiz is complete!</p>
@@ -217,6 +233,14 @@ const PlayQuiz: FC = () => {
                 ? renderQuiz()
                 : "Setting things up"
         }
+
+        <div className="fixed bg-gray-500 p-2 rounded-md bottom-4 right-4 cursor-pointer" onClick={e => dispatch(uiActions.toggleDarkTheme())}>
+            {
+                isDarkTheme
+                    ? <IoMdSunny size={32} />
+                    : <IoMdMoon size={32} />
+            }
+        </div>
     </div>
 }
 

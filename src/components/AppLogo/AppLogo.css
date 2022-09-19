@@ -1,0 +1,25 @@
+@import url('https://fonts.googleapis.com/css2?family=Kalam:wght@700&display=swap');
+
+.app-logo {
+    font-family: "Kalam";
+    user-select: none;
+}
+
+.char {
+    font-size: 40px;
+    transform: rotate(16deg);
+    margin-left: -6px;
+}
+
+.char-q {
+    font-size: 48px;
+}
+
+.char-u2 {
+    font-size: 48px;
+}
+
+.char-exc {
+    font-size: 48px;
+}
+

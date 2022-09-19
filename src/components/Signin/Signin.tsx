@@ -8,6 +8,7 @@ import { useAppDispatch, useAppSelector } from "../../types/hooks";
 import { authActions, authAsyncActions } from "../../slices/authSlice";
 import { SigninData, SignupData } from "../../types/auth";
 import { useNavigate } from "react-router-dom";
+import AppLogo from "../AppLogo/AppLogo";
 
 const signInValidation = Yup.object().shape({
     email: Yup.string()
@@ -60,7 +61,7 @@ export default function Signin() {
 
     return <div className="w-full h-screen flex items-center justify-end bg-l_background dark:bg-d_background">
         <div className="w-[500px] h-screen p-4 rounded-lg flex flex-col gap-4 items-center bg-l_backgroundLight dark:bg-d_backgroundLight shadow-lg">
-            <h1 className="">QuizUp!</h1>
+        <AppLogo/>
 
             <TextField title="Email" type="email" icon={<MdEmail size={32} />} placeholder="johndoe@gmail.com" inputRef={emailRef} />
             <TextField title="Password" type="password" icon={<MdOutlinePassword size={32} />} placeholder="•••••••••" inputRef={passwordRef} />

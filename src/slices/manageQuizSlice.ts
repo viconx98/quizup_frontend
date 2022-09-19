@@ -3,6 +3,7 @@ import { stat } from "fs";
 import axiosClient, { Endpoints } from "../axios_config";
 import { Quiz } from "../types/myquizzes";
 import { SliceState } from "../types/slice";
+import { editQuizActions } from "./editQuizSlice";
 import { myQuizzesActions } from "./myQuizzesSlice";
 
 interface ManageQuizState extends SliceState {
@@ -23,11 +24,15 @@ const initialState: ManageQuizState = {
 
 const addQuiz = createAsyncThunk(
     "manageQuizSlice/addQuiz",
-    async (title: string, { dispatch }) => {
-        const response = await axiosClient.post(Endpoints.AddQuiz, { title })
+    async (data: {title: string, navigateCallback: () => void}, { dispatch }) => {
+        const response = await axiosClient.post(Endpoints.AddQuiz, { title: data.title })
 
         // Keep the ui in sync
         dispatch(myQuizzesActions.addQuiz(response.data))
+
+        dispatch(editQuizActions.setQuizId(response.data._id))
+
+        data.navigateCallback()
 
         return response.data as Quiz
     }
@@ -57,6 +62,20 @@ const manageQuizSlice = createSlice({
         },
         setQuizToDelete(state, action: PayloadAction<string>) {
             state.quizToDelete = action.payload
+        },
+
+        resetAddDialog(state, action: PayloadAction<void>){
+            state.error = ""
+            state.isError = false
+            state.isLoading = false
+            state.loading = ""
+        },
+        resetDeleteDialog(state, action: PayloadAction<void>){
+            state.error = ""
+            state.isError = false
+            state.isLoading = false
+            state.loading = ""
+            state.quizToDelete = ""
         }
     },
     extraReducers: (builder) => {

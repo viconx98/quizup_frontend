@@ -8,7 +8,8 @@ export interface Question {
     question: string;
     correctAnswer: string;
     questionType: QuestionType;
-    options: string[] 
+    options: string[] ;
+    image: string;
 } 
 
 export interface Quiz {

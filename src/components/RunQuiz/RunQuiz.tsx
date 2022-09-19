@@ -1,20 +1,26 @@
-import { FC, useEffect, useState } from "react";
+import { FC, useEffect, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { runQuizActions } from "../../slices/runQuizSlice";
 import { Events } from "../../types/events";
 import { useAppDispatch, useAppSelector } from '../../types/hooks';
 import io, { Socket } from "socket.io-client"
 import Button from "../reusable/Button";
-import TextButton from "../reusable/TextButton";
+import QRCode from "qrcode"
+import { IoMdSunny, IoMdMoon } from "react-icons/io";
+import { uiActions } from "../../slices/uiSlice";
 
 const RunQuiz: FC = () => {
+    const canvasRef = useRef<any>()
     const dispatch = useAppDispatch()
     const { quizId, quizRoom, socketConnected } = useAppSelector(state => state.runQuiz)
     const { user } = useAppSelector(state => state.auth)
+    const { isDarkTheme } = useAppSelector(state => state.ui)
 
     const [socket, setSocket] = useState<Socket | null>(null)
 
     const params = useParams()
+
+    const baseUrl = process.env.REACT_APP_BACKEND_URL
 
     // TODO: Validation for invalid quizId
     useEffect(() => {
@@ -62,6 +68,11 @@ const RunQuiz: FC = () => {
                 socket.on(Events.QuizCreated, (data) => {
                     console.log("Events.QuizCreated")
                     dispatch(runQuizActions.setQuizRoom(data))
+
+                    setTimeout(() => {
+                        QRCode.toCanvas(canvasRef.current, baseUrl + "/play?pin=" + data.pin, { margin: 0, scale: 8, color: { dark: "#000", light: "#fff" } })
+
+                    }, 1000)
                 })
 
                 socket.on(Events.PlayerJoined, (data) => {
@@ -86,6 +97,8 @@ const RunQuiz: FC = () => {
                 socket.on(Events.QuizCompleted, (data) => {
                     dispatch(runQuizActions.setQuizRoom(data))
                 })
+
+
             }
         }
 
@@ -148,20 +161,40 @@ const RunQuiz: FC = () => {
                         </div>
 
                         <div className="flex flex-col flex-1 justify-center  bg-l_backgroundLight dark:bg-d_backgroundLight p-4 rounded-md shadow-md">
+                            <p>Invite players</p>
 
-                            <div className="flex flex-col flex-1 p-4">
+                            <div className="flex items-center flex-1 p-4 gap-4">
+                                <p>By sharing this QR Code</p>
                                 <div className="flex-1 h-full">
-                                    <p>dfdsfdsf</p>
+                                    <canvas ref={canvasRef} id="qrcode" className="w-[200px] h-[200px]"></canvas>
                                 </div>
                             </div>
 
-                            <div className="flex flex-col items-center justify-evenly flex-1 p-4">
-                                <p>Share this game pin <span className="text-3xl italic p-2 bg-primary-600/25 rounded-md shadow-md">{quizRoom.pin}</span>
-                                </p>
-                                <p>Or</p>
-                                <p>This link <Link to={"/play?pin=" + quizRoom.pin} target="_blank" className="text-2xl text-primary-500">
-                                    {"http://localhost:3000" + "/play?pin=" + quizRoom.pin}
-                                </Link></p>
+                            <div className="flex items-center gap-2 text-gray-500">
+                                <hr className="w-full h-[2px] border-none bg-gray-500/50"/>
+                                <p>OR</p>
+                                <hr className="w-full h-[2px] border-none bg-gray-500/50"/>
+                            </div>
+
+                            <div className="flex items-center flex-1 p-4 gap-4">
+                                <p>By sharing this game pin </p>
+                                <span className="text-3xl italic p-2 bg-primary-600/25 rounded-md shadow-md">{quizRoom.pin}</span>
+
+                            </div>
+
+                            <div className="flex items-center gap-2 text-gray-500">
+                                <hr className="w-full h-[2px] border-none bg-gray-500/50"/>
+                                <p>OR</p>
+                                <hr className="w-full h-[2px] border-none bg-gray-500/50"/>
+                            </div>
+
+                            <div className="flex items-center flex-1 p-4 gap-4">
+                                <p>By sharing this link</p>
+                                <div className="flex-1">
+                                    <Link to={"/play?pin=" + quizRoom.pin} target="_blank" className="text-2xl text-primary-500">
+                                        {baseUrl + "/play?pin=" + quizRoom.pin}
+                                    </Link>
+                                </div>
                             </div>
 
                         </div>
@@ -179,26 +212,35 @@ const RunQuiz: FC = () => {
 
                     </div>
 
-                    <p className="text-4xl">
-                        {quizRoom.quiz.questions[quizRoom.currentIndex].question}
-                    </p>
+                    <div className="flex gap-4">
+                        {
+                            quizRoom.quiz.questions[quizRoom.currentIndex].image
+                            && <img className="max-w-[400px] rounded-md" src={quizRoom.quiz.questions[quizRoom.currentIndex].image} alt="" />
+                        }
 
-                    <div className="flex flex-col gap-4">
-                        {quizRoom.quiz.questions[quizRoom.currentIndex].options.map(opt => {
-                            const answerCount = getAnswerCount(opt, quizRoom.quiz.questions[quizRoom.currentIndex]._id)
-                            const playerCount = quizRoom.players.length
-                            const barWidth = Math.round((answerCount / playerCount) * 100)
+                        <div className="flex flex-col flex-1 gap-4">
+                            <p className="text-4xl">
+                                {quizRoom.quiz.questions[quizRoom.currentIndex].question}
+                            </p>
 
-                            return <div className="relative w-full rounded-md bg-l_backgroundLight dark:bg-d_backgroundLight">
-                                <div style={{
-                                    width: barWidth + "%",
-                                    transition: "width 300ms ease"
-                                }}
+                            <div className="flex flex-col gap-4">
+                                {quizRoom.quiz.questions[quizRoom.currentIndex].options.map(opt => {
+                                    const answerCount = getAnswerCount(opt, quizRoom.quiz.questions[quizRoom.currentIndex]._id)
+                                    const playerCount = quizRoom.players.length
+                                    const barWidth = Math.round((answerCount / playerCount) * 100)
 
-                                    className="absolute top-0 left-0 z-0 h-full rounded-md bg-green-500/30"></div>
-                                <p className="relative p-4 z-10">{opt}</p>
+                                    return <div className="relative w-full rounded-md bg-l_backgroundLight dark:bg-d_backgroundLight">
+                                        <div style={{
+                                            width: barWidth + "%",
+                                            transition: "width 300ms ease"
+                                        }}
+
+                                            className="absolute top-0 left-0 z-0 h-full rounded-md bg-green-500/30"></div>
+                                        <p className="relative p-4 z-10">{opt}</p>
+                                    </div>
+                                })}
                             </div>
-                        })}
+                        </div>
                     </div>
                 </div>
             case "completed":
@@ -217,7 +259,7 @@ const RunQuiz: FC = () => {
                                 console.log(totalQuestions, incorrectAnswers, incorrectWidth, correctWidth)
 
                                 return <div className="overflow-hidden flex w-full bg-l_backgroundLighter dark:bg-d_backgroundLighter rounded-md">
-                                    <div className="flex flex-col items-center px-2 gap-2">
+                                    <div className="flex flex-col items-center px-2 gap-2 min-w-[100px] max-w-[100px]">
                                         <img src={player.avatar} className="h-[48px] w-[48px]" />
                                         <p>{player.username}</p>
                                     </div>
@@ -239,6 +281,10 @@ const RunQuiz: FC = () => {
                                             }
                                         </div>
                                     }
+
+                                    <div className="flex flex-col items-center justify-center px-2 gap-2 h-full min-w-[64px] max-w-[64px]">
+                                        <p className="text-2xl font-bold">{player.correctAnswers + incorrectAnswers}</p>
+                                    </div>
                                 </div>
                             })
                         }
@@ -256,6 +302,14 @@ const RunQuiz: FC = () => {
                 ? renderQuiz()
                 : "Setting things up"
         }
+
+        <div className="fixed bg-gray-500 p-2 rounded-md bottom-4 right-4 cursor-pointer" onClick={e => dispatch(uiActions.toggleDarkTheme())}>
+            {
+                isDarkTheme
+                    ? <IoMdSunny size={32} />
+                    : <IoMdMoon size={32} />
+            }
+        </div>
     </div>
 }
 

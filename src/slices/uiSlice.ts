@@ -5,9 +5,12 @@ interface UiState {
     currentTab: string;
 }
 
+const preference = localStorage.getItem("theme")
+const prefersDark = preference !== null && preference === "dark"
+
 // TODO: Load preference from local storage
 const initialState: UiState = {
-    isDarkTheme: true,
+    isDarkTheme: prefersDark,
     currentTab: "myquizzes"
 }
 
@@ -17,13 +20,15 @@ const uiSlice = createSlice({
     reducers: {
         toggleDarkTheme(state, action: PayloadAction<void>) {
             state.isDarkTheme = !state.isDarkTheme
+
+            localStorage.setItem("theme", state.isDarkTheme ? "dark" : "light")
         },
-        setTab(state, action: PayloadAction<string>){
+        setTab(state, action: PayloadAction<string>) {
             state.currentTab = action.payload
         }
     }
 })
 
 
-export const uiActions = {...uiSlice.actions}
+export const uiActions = { ...uiSlice.actions }
 export default uiSlice.reducer
